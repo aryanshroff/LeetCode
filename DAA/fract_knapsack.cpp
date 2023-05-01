@@ -9,8 +9,8 @@ public:
     int serial_number;
     int item_value;
     int item_weight;
-    double ratio;
-    double fraction;
+    double ratio; //ratio of poorofit to weight
+    double fraction;  //denotes the accepted fraction of the object
 
     Knapsack(int i, int p, int w)
     {
