@@ -1,9 +1,6 @@
-#include <iostream>
 #include <bits/stdc++.h>
 using namespace std;
 using namespace std::chrono;
-
-
 
 template <typename T>
 void print1d(vector<T> v){
@@ -60,69 +57,48 @@ void printhash(unordered_map<K,V> h){
     cout<<endl;
 }
 
-
-
-
-int solve(vector<int> &coins, int amount)
-{
-    int r = coins.size() + 1;
-    int c = amount + 1;
-    vector<vector<int>> dp(r, vector<int>(c, INT16_MAX));
-    cout << "Tabulated Matrix" << endl;
-    print2d(dp);
-
-    cout << "Filling the base cases" << endl;
-    for (int j = 1; j < c; j++)
-    {
-        dp[0][j] = INT16_MAX;
-    }
-    for (int i = 0; i < r; i++)
-    {
-        dp[i][0] = 0;
-    }
-    print2d(dp);
-    long res1, res2 = 0;
-    int cell = 0;
-    cout << "Filling the general cases" << endl;
-    // filling 1,1 to r,c th cell
-    for (int i = 1; i < r; i++)
-    {
-        for (int j = 1; j < c; j++)
-        {
-            // if excluding current coin
-            res1 = dp[i - 1][j];
-            // if including current coin
-            cell = j - coins[i - 1];
-            if (cell > -1)
-            {
-                res2 = dp[i][j - coins[i - 1]] + 1;
-
-                // taking minimum of both cases
-
-                dp[i][j] = min(res1, res2);
+//2d vec of charecter to 2d vec of int
+vector<vector<int>> convert(vector<vector<char>> v){
+    vector<vector<int>> ans;
+    for(int i=0;i<v.size();i++){
+        vector<int> temp;
+        for(int j=0;j<v[0].size();j++){
+            if(v[i][j]=='1'){
+                temp.push_back(1);
             }
-            else
-            {
-                dp[i][j] = res1;
+            else{
+                temp.push_back(0);
             }
         }
+        ans.push_back(temp);
     }
-    print2d(dp);
-    return dp[r - 1][c - 1];
+    return ans;
 }
+
+
+//************************************************************************************************************************************************************************************************
+//************************************************************************************************************************************************************************************************
+
+
+void mymain()
+{
+    string s="";
+    int result=0;
+    cout<<"result: "<<result<<endl;
+}
+
+
+//************************************************************************************************************************************************************************************************
+//************************************************************************************************************************************************************************************************
+
 
 int main()
 {
     // take all input here
-    vector<int> coins = {1, 2, 5};
-    int amount = 19;
+
     // input end
     chrono::system_clock::time_point start = high_resolution_clock::now();
-    int res = solve(coins, amount);
-    cout<<"Coins array: ";
-    print1d(coins);
-    cout<<"Required amount: "<<amount<<endl;
-    cout << "Minimum number of coins needed :" << res << endl;
+    mymain();
     chrono::system_clock::time_point stop = high_resolution_clock::now();
     chrono::milliseconds duration = duration_cast<milliseconds>(stop - start);
 
