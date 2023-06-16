@@ -93,140 +93,109 @@ void generate(string s)
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
-int getState(int a, int b)
+bool circleCheck(int xp, int yp, int rp, int xc, int yc)
 {
-    return a * 1000 + b;
-}
-
-// fill a to brim
-// fill b to brim
-// empty a
-// empty b
-// transfer a to b
-// transfer b to a
-
-bool canMeasureWater(int x, int y, int t)
-{
-    if(t>x+y){
+    long long term1, term2, term3;
+    term1 = pow(xp - xc, 2);
+    term2 = pow(yp - yc, 2);
+    term3 = term2 - pow(rp, 2);
+    if (term1 + term3 <= 0)
+    {
+        return true;
+    }
+    else
+    {
         return false;
     }
-    queue<pair<int, int>> q;
-    int a = 0,tempx=0;
-    int b = 0,tempy=0;
-    q.push({a, b});
-    q.push({-1,-1});
-    int sum = 0,state=0;
-    unordered_set<int> h;
-    h.insert(getState(a, b));
-    
-    bool res = false;
-    while (q.size() >1)
+}
+
+void adjList(vector<vector<int>> &bombs, vector<vector<int>> &List, int n)
+{
+    for (int i = 0; i < n; i++)
     {
-        a = q.front().first;
-        b = q.front().second;
+        vector<int> temp; // ith index of temp will store all indices of explodable children in bombs
+        for (int j = 0; j < n; j++)
+        {
+            if (i == j)
+                continue;
+            // i is parent and j is child
+            //  we have to check if j satisfies the circle equation of i
+            bool res = circleCheck(bombs[i][0], bombs[i][1], bombs[i][2], bombs[j][0], bombs[j][1]);
+            if (res == true)
+            {
+                temp.push_back(j);
+            }
+        }
+        List.push_back(temp);
+    }
+    //print2d(List);
+    return;
+}
+
+int explosionCount(vector<vector<int>> &List, int parent, vector<vector<int>> &bombs, int n)
+{
+    int count = 1,child=0;
+    queue<int> q; // q will store indices of explodable childrem
+    q.push(parent);
+    q.push(-1);
+    vector<bool> visited(n, false);
+    visited[parent] = true; // mark true as soon as u enter in the queue
+    while (q.size() > 1)
+    {
+        parent = q.front();
         q.pop();
-        cout<<a<<" "<<b<<endl;
-        if(a==-1  and b==-1){
-            q.push({-1,-1});
+        if (parent == -1)
+        {
+            q.push(parent);
             continue;
         }
-
-        // fill a to brim
-        if(x+b==t){
-            res=true;
-            break;
-        }
-        state = getState(x, b);
-        if (h.find(state) == h.end())
+        // add all unvisited children of parent to q and then mark them visited
+        for (int i = 0; i < List[parent].size(); i++)
         {
-            h.insert(state);
-            q.push({x, b});
+            child = List[parent][i];
+            if (visited[child] == false)
+            {
+                q.push(child);
+                visited[child] = true;
+                count++;
+            }
         }
-
-        // fill b to brim
-        if(a+y==t){
-            res=true;
-            break;
-        }
-        state = getState(a, y);
-        if (h.find(state) == h.end())
-        {
-            h.insert(state);
-            q.push({a, y});
-        }
-
-        // empty a
-        if(0+b==t){
-            res=true;
-            break;
-        }
-        state = getState(0, b);
-        if (h.find(state) == h.end())
-        {
-            h.insert(state);
-            q.push({0, b});
-        }
-
-        // empty b
-        if(a+0==t){
-            res=true;
-            break;
-        }
-        state = getState(a, 0);
-        if (h.find(state) == h.end())
-        {
-            h.insert(state);
-            q.push({a, 0});
-        }
-
-        // transfer a
-        if(a+b>y){
-            tempx=a+b-y;
-            tempy=y;
-        }
-        else{
-            tempy=a+b;
-            tempx=0;
-        }
-        state = getState(tempx,tempy);
-        if(tempx+tempy==t){
-            res=true;
-            break;
-        }
-        if (h.find(state) == h.end())
-        {
-            h.insert(state);
-            q.push({tempx, tempy});
-        }
-
-        // transfer b
-        if(a+b>x){
-            tempy=a+b-x;
-            tempx=x;
-        }
-        else{
-            tempx=a+b;
-            tempy=0;
-        }
-        state = getState(tempx,tempy);
-        if(tempx+tempy==t){
-            res=true;
-            break;
-        }
-        if (h.find(state) == h.end())
-        {
-            h.insert(state);
-            q.push({tempx, tempy});
-        }
-        
     }
-    return res;
+
+    return count;
+}
+
+int maximumDetonation(vector<vector<int>> &bombs)
+{
+    int n = bombs.size();
+    // generate an adjecentcy list of parent and explodable children
+    vector<vector<int>> List;
+    adjList(bombs, List, n);
+    // for each parent in above list treat it as source and count number of explosion
+    int maxCount = 0, count = 0;
+    int source = 0;
+    for (int i = 0; i < n; i++)
+    {
+        count = explosionCount(List, i, bombs, n);
+        if (count > maxCount)
+        {
+            maxCount = count;
+            source = i;
+            if(maxCount ==n){
+                break;
+            }
+        }
+    }
+    // the parent with max explosions is to be returned
+    return maxCount;
 }
 
 void mymain()
 {
-    
-    int result = canMeasureWater(32,43,7);
+    string s = "[[1,2,3],[2,3,1],[3,4,2],[4,5,3],[5,6,4]]";
+    generate(s);
+    vector<vector<int>> bombs = {{1, 2, 3}, {2, 3, 1}, {3, 4, 2}, {4, 5, 3}, {5, 6, 4}};
+    int result = maximumDetonation(bombs);
     cout << "result: " << result << endl;
 }
 
