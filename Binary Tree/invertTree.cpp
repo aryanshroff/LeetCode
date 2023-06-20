@@ -101,18 +101,22 @@ struct TreeNode
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-
-//call generate function to generate 2d vector from string s
+// call generate function to generate 2d vector from string s
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
-
+TreeNode *invertTree(TreeNode *root)
+{
+    if(root==NULL) return NULL;
+    root->right=invertTree(root->left);
+    root->left=invertTree(root->right);
+    return root;
+}
 
 void mymain()
 {
     string s = "";
     int result = 0;
-    MakeTree(s);
     cout << "result: " << result << endl;
 }
 

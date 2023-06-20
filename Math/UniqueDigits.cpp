@@ -102,17 +102,46 @@ struct TreeNode
 };
 
 
-//call generate function to generate 2d vector from string s
+// call generate function to generate 2d vector from string s
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
+int boxFill(int x)
+{
+    vector<int> key = {9, 9, 8, 7, 6, 5, 4, 3};
+    int product = 1;
+    for (int i = 0; i < x; i++)
+    {
+        product = key[i] * product;
+    }
+    return product ;
+}
 
+int countNumbersWithUniqueDigits(int n)
+{
+    if (n == 0)
+    {
+        return 1;
+    }
+    if (n == 1)
+    {
+        return 10;
+    }
+
+    // we will solve for exactly 1 to exactly n digits
+    int res = 10;
+    for (int i = 2; i <= n; i++)
+    {
+        res+=boxFill(i);
+    }
+
+    return res;
+}
 
 void mymain()
 {
     string s = "";
-    int result = 0;
-    MakeTree(s);
+    int result = countNumbersWithUniqueDigits(4);
     cout << "result: " << result << endl;
 }
 
