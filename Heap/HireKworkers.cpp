@@ -68,6 +68,16 @@ void printhash(unordered_map<K, V> h)
     cout << endl;
 }
 
+template <class T>
+void printHeap(priority_queue<T>& pq){
+    while(pq.size()){
+        cout<<pq.top()<<endl;
+        pq.pop();
+    }
+}
+
+
+
 // 2d vec of charecter to 2d vec of int
 void generate(string s)
 {
@@ -101,114 +111,129 @@ struct TreeNode
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+
+
 // call generate function to generate 2d vector from string s
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
-int solve(bool Alice, int i, int capacity, vector<int> &v, int n,vector<vector<vector<int>>> &dp)
+long long totalCost(vector<int> &costs, int k, int pqs)
 {
-    if (i >= n)
+    // pqs i.e size of pq and k=number of hiring rounds takking place
+    priority_queue<int, vector<int>, greater<int>> lpq;
+    priority_queue<int, vector<int>, greater<int>> rpq;
+    int n = costs.size();
+    cout<<"n: "<<n<<" k: "<<k<<" pqs: "<<pqs<<endl;
+    cout<<endl;
+    int i = 0, j = n - 1, cs = 0;
+    // cs is the current pq size
+    long long sum = 0;
+    // fill candidate number of elements in both the pqs
+    while (true)
     {
-        // 1st unpicked index is out of bounds
-        return 0;
-    }
-    int res = 0;
-    //dp table 0th row is alice and 1st row is bob
-    //dp[0][i] for alice at ith index
-    if (Alice == true)
-    {
-        int memo=dp[0][i][capacity];
-        if(memo!=0){
-            return memo;
-        }
-        // its alices turn to play
-        // we gonna return max of all scores returned by all branches
-        // hence set res to int min
-        res = INT_MIN;
-        // x denotes how many elements picked by alice => [1st] or [1st , 2nd] or [1,2,3]
-        // at x==0 pick v[i]
-        // at x==1 pick v[i]+v[i+1]
-        // at x==2 pick v[i] +v[i+1]+v[i+2]
-        // store a prefix array
-        int prefix = 0;
-        for (int x = 0; x < capacity; x++)
+        if (cs >= pqs)
         {
-            if (i + x < n)
-            {
-                prefix += v[i + x];
-                // we send i+x+1 to recursive call
-                int score = prefix + solve(false, i + x + 1, 3, v, n,dp);
-                res = max(res, score);
-            }
+            break;
         }
-        dp[0][i][capacity]=res;
-        return res;
+        cout<<"v[i] = "<<costs[i]<<"  v[j]: "<<costs[j];
+        cout<<"         i: "<<i<<" j: "<<j<<endl;
+        lpq.push(costs[i]);
+        
+        i++;
+        if(i>=j){
+            break;
+        }
+        rpq.push(costs[j]);
+        j--;
+        if(i>=j){
+            break;
+        }
+        cs++;
     }
-    else
+    cout<<endl;
+    cout<<"143 i: "<<i<<" j: "<<j<<endl;
+
+    // reached here means both pqs are filled time to hire
+    
+    int round = 0;
+    int lt = 0, rt = 0;
+    while (round < k and i <= j)
     {
-        // we are playing for bob hence from all the alice scores we get from next branch we will return the min score
-        int memo=dp[1][i][capacity];
-        if(memo!=0){
-            return memo;
-        }
-        res = INT_MAX;
-        for (int x = 0; x < capacity; x++)
+        long long temp=sum;
+        lt = lpq.top();
+        rt = rpq.top();
+        if (lt <= rt)
         {
-            res = min(res, solve(true, i + x + 1, 3, v, n,dp));
+            sum += lt;
+            lpq.pop();
+            lpq.push(costs[i]);
+            i++;
         }
-        dp[1][i][capacity] = res;
-        return res;
-    }
-}
-
-string stoneGameIII(vector<int> &v)
-{
-
-    // 3 variables to keep track of
-    //  1. whose turn it is
-    //  2. current unpicked index i
-    //  3. maximum capacity of pick (which is 3 throughout the problem)
-    int n=v.size();
-
-    //3d dp 
-    //1st page alice 2nd page bob
-    vector<vector<vector<int> > > dp; //i for row j for cols and p for pages
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            dp[0][i][j]=0;
-            dp[1][i][j]=0;
+        else
+        {
+            // right top is smaller
+            sum += rt;
+            rpq.pop();
+            rpq.push(costs[j]);
+            j--;
         }
+        cout<<"167 picked: "<<sum-temp<<endl;
+        round++;
     }
-    int i = 0, capacity = 3;
-    int AliceScore = solve(true, i, capacity, v, v.size(),dp);
-    int total = 0;
-    for (int i = 0; i < v.size(); i++)
+    // reached here means either rounds are over or i equals j
+    while (round<k and lpq.size()> 0 and rpq.size() > 0)
     {
-        total += v[i];
+        long long temp=sum;
+        lt = lpq.top();
+        rt = rpq.top();
+        if (lt <= rt)
+        {
+            sum += lt;
+            lpq.pop();
+        }
+        else
+        {
+            // right top is smaller
+            sum += rt;
+            rpq.pop();
+        }
+        cout<<"187 picked: "<<sum-temp<<endl;
+
+        round++;
     }
-    int BobScore = total - AliceScore;
-    cout << "Alice Score: " << AliceScore << "  BobScore: " << BobScore << endl;
-    if (BobScore == AliceScore)
+    while (round < k and lpq.size() > 0)
     {
-        return "Tie";
+        // reached here means rpq is empty
+        lt = lpq.top();
+        sum += lt;
+        lpq.pop();
+        round++;
+        cout<<"197 sum: "<<sum<<endl;
+
     }
-    else if (BobScore > AliceScore)
+    while (round < k and rpq.size() > 0)
     {
-        return "Bob";
+        // reached here means lpq is empty
+        rt = rpq.top();
+        sum += rt;
+        rpq.pop();
+        round++;
+        cout<<"207 sum: "<<sum<<endl;
+
     }
-    else
-    {
-        return "Alice";
-    }
+    // now we are sure rounds are over
+    return sum;
 }
 
 void mymain()
 {
     string s = "";
-
-    vector<int> v = {1, 2, 3, -9};
-    s = stoneGameIII(v);
-    cout << "result: " << s << endl;
+    vector<int> costs = {48};
+    int k = 1;
+    int candidates = 1;
+    print1d(costs);
+    long long result = totalCost(costs, k, candidates);
+    cout << "result: " << result << endl;
 }
 
 //************************************************************************************************************************************************************************************************
