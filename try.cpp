@@ -1,93 +1,102 @@
-class Solution
+long long totalCost(vector<int> &costs, int k, int pqs)
 {
-public:
-    int solve(bool Alice, int i, int capacity, vector<int> &v, int n, vector<vector<int>> &dp)
+    // pqs i.e size of pq and k=number of hiring rounds takking place
+    priority_queue<int, vector<int>, greater<int>> lpq;
+    priority_queue<int, vector<int>, greater<int>> rpq;
+    int n = costs.size();
+
+    int i = 0, j = n - 1, cs = 0;
+    // cs is the current pq size
+    long long sum = 0;
+    // fill candidate number of elements in both the pqs
+    while (true)
     {
-        if (i >= n)
+        if (cs >= pqs)
         {
-            // 1st unpicked index is out of bounds
-            return 0;
+            break;
         }
-        int res = 0;
-        // dp table 0th row is alice and 1st row is bob
-        // dp[0][i] for alice at ith index
-        if (Alice == true)
+        cout << "v[i] = " << costs[i] << "  v[j]: " << costs[j];
+        cout << "         i: " << i << " j: " << j << endl;
+        lpq.push(costs[i]);
+
+        i++;
+        if (i >= j)
         {
-            int memo = dp[0][i];
-            if (memo != 0)
-            {
-                return memo;
-            }
-            // its alices turn to play
-            // we gonna return max of all scores returned by all branches
-            // hence set res to int min
-            res = INT_MIN;
-            // x denotes how many elements picked by alice => [1st] or [1st , 2nd] or [1,2,3]
-            // at x==0 pick v[i]
-            // at x==1 pick v[i]+v[i+1]
-            // at x==2 pick v[i] +v[i+1]+v[i+2]
-            // store a prefix array
-            int prefix = 0;
-            for (int x = 0; x < capacity; x++)
-            {
-                if (i + x < n)
-                {
-                    prefix += v[i + x];
-                    // we send i+x+1 to recursive call
-                    int score = prefix + solve(false, i + x + 1, 3, v, n, dp);
-                    res = max(res, score);
-                }
-            }
-            dp[0][i] = res;
-            return res;
+            break;
+        }
+        rpq.push(costs[j]);
+        j--;
+        if (i >= j)
+        {
+            break;
+        }
+        cs++;
+    }
+    cout << endl;
+
+    // reached here means both pqs are filled time to hire
+
+    int round = 0;
+    int lt = 0, rt = 0;
+    while (round < k and i <= j)
+    {
+
+        lt = lpq.top();
+        rt = rpq.top();
+        if (lt <= rt)
+        {
+            sum += lt;
+            lpq.pop();
+            lpq.push(costs[i]);
+            i++;
         }
         else
         {
-            // we are playing for bob hence from all the alice scores we get from next branch we will return the min score
-            int memo = dp[1][i];
-            if (memo != 0)
-            {
-                return memo;
-            }
-            res = INT_MAX;
-            for (int x = 0; x < capacity; x++)
-            {
-                res = min(res, solve(true, i + x + 1, 3, v, n, dp));
-            }
-            dp[1][i] = res;
-            return res;
+            // right top is smaller
+            sum += rt;
+            rpq.pop();
+            rpq.push(costs[j]);
+            j--;
         }
-    }
 
-    string stoneGameIII(vector<int> &v)
+        round++;
+    }
+    // reached here means either rounds are over or i equals j
+    while (round < k and lpq.size() > 0 and rpq.size() > 0)
     {
 
-        // 3 variables to keep track of
-        //  1. whose turn it is
-        //  2. current unpicked index i
-        //  3. maximum capacity of pick (which is 3 throughout the problem)
-        int n = v.size();
-        vector<vector<int>> dp(2, vector<int>(n, 0));
-        int i = 0, capacity = 3;
-        int AliceScore = solve(true, i, capacity, v, v.size(), dp);
-        int total = 0;
-        for (int i = 0; i < v.size(); i++)
+        lt = lpq.top();
+        rt = rpq.top();
+        if (lt <= rt)
         {
-            total += v[i];
-        }
-        int BobScore = total - AliceScore;
-        cout << "Alice Score: " << AliceScore << "  BobScore: " << BobScore << endl;
-        if (BobScore == AliceScore)
-        {
-            return "Tie";
-        }
-        else if (BobScore > AliceScore)
-        {
-            return "Bob";
+            sum += lt;
+            lpq.pop();
         }
         else
         {
-            return "Alice";
+            // right top is smaller
+            sum += rt;
+            rpq.pop();
         }
+
+        round++;
     }
-};
+    while (round < k and lpq.size() > 0)
+    {
+        // reached here means rpq is empty
+        lt = lpq.top();
+        sum += lt;
+        lpq.pop();
+        round++;
+    }
+    while (round < k and rpq.size() > 0)
+    {
+        // reached here means lpq is empty
+        rt = rpq.top();
+        sum += rt;
+        rpq.pop();
+        round++;
+    }
+    // now we are sure rounds are over
+    return sum;
+}

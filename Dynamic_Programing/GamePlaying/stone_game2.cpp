@@ -105,7 +105,7 @@ struct TreeNode
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
-int solve(bool Alice, int i, int capacity, vector<int> &v, int n,vector<vector<vector<int>>> &dp)
+int solve(bool Alice, int i, int capacity, vector<int> &v, int n,unordered_map<string,int> &h)
 {
     if (i >= n)
     {
@@ -115,11 +115,14 @@ int solve(bool Alice, int i, int capacity, vector<int> &v, int n,vector<vector<v
     int res = 0;
     //dp table 0th row is alice and 1st row is bob
     //dp[0][i] for alice at ith index
+    int cap=0;
     if (Alice == true)
     {
-        int memo=dp[0][i][capacity];
-        if(memo!=0){
-            return memo;
+        
+        string s="0_"+to_string(i)+"_"+to_string(capacity);
+        auto it=h.find(s);
+        if(it!=h.end()){
+            return it->second;
         }
         // its alices turn to play
         // we gonna return max of all scores returned by all branches
@@ -137,26 +140,30 @@ int solve(bool Alice, int i, int capacity, vector<int> &v, int n,vector<vector<v
             {
                 prefix += v[i + x];
                 // we send i+x+1 to recursive call
-                int score = prefix + solve(false, i + x + 1, 3, v, n,dp);
+                cap=max(x,capacity);
+                int score = prefix + solve(false, i + x + 1, cap, v, n,h);
                 res = max(res, score);
             }
         }
-        dp[0][i][capacity]=res;
+        h[s]=res;
         return res;
     }
     else
     {
         // we are playing for bob hence from all the alice scores we get from next branch we will return the min score
-        int memo=dp[1][i][capacity];
-        if(memo!=0){
-            return memo;
+        string s="1_"+to_string(i)+"_"+to_string(capacity);
+        auto it=h.find(s);
+        if(it!=h.end()){
+            return it->second;
         }
         res = INT_MAX;
         for (int x = 0; x < capacity; x++)
         {
-            res = min(res, solve(true, i + x + 1, 3, v, n,dp));
+            cap=max(x, capacity);
+            res = min(res, solve(true, i + x + 1, cap, v, n,h));
         }
-        dp[1][i][capacity] = res;
+        
+        h[s]= res;
         return res;
     }
 }
@@ -170,17 +177,11 @@ string stoneGameIII(vector<int> &v)
     //  3. maximum capacity of pick (which is 3 throughout the problem)
     int n=v.size();
 
-    //3d dp 
-    //1st page alice 2nd page bob
-    vector<vector<vector<int> > > dp; //i for row j for cols and p for pages
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            dp[0][i][j]=0;
-            dp[1][i][j]=0;
-        }
-    }
+    unordered_map<string,int> h;
+    //0 for alice underscore i underscore j
+
     int i = 0, capacity = 3;
-    int AliceScore = solve(true, i, capacity, v, v.size(),dp);
+    int AliceScore = solve(true, i, capacity, v, v.size(),h);
     int total = 0;
     for (int i = 0; i < v.size(); i++)
     {
