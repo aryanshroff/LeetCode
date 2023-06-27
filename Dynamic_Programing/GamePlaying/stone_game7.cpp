@@ -105,14 +105,15 @@ struct TreeNode
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
-int subsetSum(int x, int y,int n, vector<int> &left, vector<int> &v)
+int subsetSum(int x, int y, int n, vector<int> &left, vector<int> &v)
 {
     // both limits are inclusive in nature
     if (x > y)
     {
         return 0;
     }
-    else if(x==y){
+    else if (x == y)
+    {
         return v[x];
     }
     else if (x == 0)
@@ -125,52 +126,81 @@ int subsetSum(int x, int y,int n, vector<int> &left, vector<int> &v)
     }
 }
 
-void printState(bool alice,int c1,int v1,int c2,int v2,int start,int end,int depth){
-    string s="turn: ";
-    if(alice){
-        s+="Alice ";
+void printState(bool alice, int c1, int v1, int c2, int v2, int start, int end, int depth)
+{
+    string s = "turn: ";
+    if (alice)
+    {
+        s += "Alice ";
     }
-    else{
-        s+="Bob ";
+    else
+    {
+        s += "Bob ";
     }
-    cout<<s<<" choice1: "<<c1<<" val1: "<<v1<<" choice2: "<<c2<<" val2: "<<v2 <<" start: "<<start<<" end: "<<end<<" depth: "<<depth<<endl;
+    cout << endl;
+    cout << s << " choice1: " << c1 << " val1: " << v1 << " choice2: " << c2 << " val2: " << v2 << " start: " << start << " end: " << end << " depth: " << depth << endl;
 }
 
-int dfs(vector<int> &v, vector<int> left, int start, int end, bool alice, int n, int as, int bs,int depth)
+int dfs(vector<int> &v, vector<int> left, int start, int end, bool alice, int n, int as, int bs, int depth, unordered_map<string, int> &h)
 {
-    if(start==end){
-        return as-bs;
+    if (start == end)
+    {
+        // cout<<"depth: "<<depth<<endl;
+        int ans = as - bs;
+        cout << "ans: " << ans << endl;
+        return ans;
     }
     if (alice == true)
     {
+        /*
+        string s = "alice_" + to_string(start) + "_" + to_string(end);
+        auto it = h.find(s);
+        if (it != h.end())
+        {
+            return it->second;
+        }
+        */
         // its alices turn
         // as is alice score
         // lets say she picks start limits for next round are start+1,end
 
-        //we are returning alice-bob at all cases hence we always add choice to val
-        int choice1= subsetSum(start+1,end,n,left,v);
-        int val1=dfs(v,left,start+1,end,false,n,as+choice1,bs,depth+1)+choice1;
-        int choice2= subsetSum(start,end-1,n,left,v);
-        int val2=dfs(v,left,start,end-1,false,n,as+choice2,bs,depth+1)+choice2;
-        //alice will try to maximise her score
-        printState(alice,choice1,val1,choice2,val2,start,end,depth);
-        return max(val2,val1);
-        
+        // we are returning alice-bob at all cases hence we always add choice to val
+        int choice1 = subsetSum(start + 1, end, n, left, v);
+        int val1 = dfs(v, left, start + 1, end, false, n, as + choice1, bs, depth + 1, h);
+        int choice2 = subsetSum(start, end - 1, n, left, v);
+        int val2 = dfs(v, left, start, end - 1, false, n, as + choice2, bs, depth + 1, h);
+        // alice will try to maximise her score
+        printState(alice, choice1, val1, choice2, val2, start, end, depth);
+        int ans = max(val2, val1);
+        cout << "at depth " << depth << " alice returns: " << ans << endl;
+        //h[s] = ans;
+        return ans;
     }
-    else{
-        //its bobs turn
-        //we will return min out of val1 and val2
+    else
+    {
+        // its bobs turn
+        // we will return min out of val1 and val2
+        /*
+        string s = "bob_" + to_string(start) + "_" + to_string(end);
+        auto it = h.find(s);
+        if (it != h.end())
+        {
+            return it->second;
+        }
+        */
+        // bobs picks first element
+        int choice1 = subsetSum(start + 1, end, n, left, v);
+        int val1 = dfs(v, left, start + 1, end, true, n, as, bs + choice1, depth + 1, h);
 
-        //bobs picks first element
-        int choice1= subsetSum(start+1,end,n,left,v);
-        int val1=dfs(v,left,start+1,end,true,n,as,bs+choice1,depth+1)-choice1;
+        // bob picks last element
+        int choice2 = subsetSum(start, end - 1, n, left, v);
+        int val2 = dfs(v, left, start, end - 1, true, n, as, bs + choice2, depth + 1, h);
+        printState(alice, choice1, val1, choice2, val2, start, end, depth);
 
-        //bob picks last element
-        int choice2= subsetSum(start,end-1,n,left,v);
-        int val2=dfs(v,left,start,end-1,true,n,as,bs+choice2,depth+1)-choice2;
-        printState(alice,choice1,val1,choice2,val2,start,end,depth);
-
-        return min(val1,val2);
+        int ans = min(val1, val2);
+        cout << "at depth " << depth << " bob returns: " << ans << endl;
+        //h[s]=ans;
+        return ans;
     }
 }
 
@@ -180,6 +210,7 @@ int stoneGameVII(vector<int> &v)
     // generate sum of subarrays of all lengths from i=0 to i=n
     int n = v.size();
     vector<int> left;
+    unordered_map<string, int> h;
     int total = 0, curr_left = 0;
     for (int i = 0; i < n; i++)
     {
@@ -190,15 +221,17 @@ int stoneGameVII(vector<int> &v)
     }
     total = curr_left;
     // prefix array is ready
-    return dfs(v, left, 0, n - 1, true, n, 0, 0,0);
+    return dfs(v, left, 0, n - 1, true, n, 0, 0, 1, h);
 }
 
 void mymain()
 {
     string s = "";
-    vector<int> v={5,3,1,4,2};
-    cout<<endl<<endl;
+    vector<int> v = {7, 90, 5, 1, 100, 10, 10, 2};
+
     int result = stoneGameVII(v);
+    cout << endl
+         << endl;
     cout << "result: " << result << endl;
 }
 
