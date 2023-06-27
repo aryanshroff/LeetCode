@@ -1,102 +1,93 @@
-long long totalCost(vector<int> &costs, int k, int pqs)
+class Solution
 {
-    // pqs i.e size of pq and k=number of hiring rounds takking place
-    priority_queue<int, vector<int>, greater<int>> lpq;
-    priority_queue<int, vector<int>, greater<int>> rpq;
-    int n = costs.size();
-
-    int i = 0, j = n - 1, cs = 0;
-    // cs is the current pq size
-    long long sum = 0;
-    // fill candidate number of elements in both the pqs
-    while (true)
+public:
+    bool dfs(int n, vector<int> &v, unordered_map<string, bool> &h, int len, bool Alice)
     {
-        if (cs >= pqs)
+        // do not make calls on negative n
+        if (Alice == true)
         {
-            break;
-        }
-        cout << "v[i] = " << costs[i] << "  v[j]: " << costs[j];
-        cout << "         i: " << i << " j: " << j << endl;
-        lpq.push(costs[i]);
-
-        i++;
-        if (i >= j)
-        {
-            break;
-        }
-        rpq.push(costs[j]);
-        j--;
-        if (i >= j)
-        {
-            break;
-        }
-        cs++;
-    }
-    cout << endl;
-
-    // reached here means both pqs are filled time to hire
-
-    int round = 0;
-    int lt = 0, rt = 0;
-    while (round < k and i <= j)
-    {
-
-        lt = lpq.top();
-        rt = rpq.top();
-        if (lt <= rt)
-        {
-            sum += lt;
-            lpq.pop();
-            lpq.push(costs[i]);
-            i++;
+            string s = "alice_" + to_string(n);
+            auto it = h.find(s);
+            if (it != h.end())
+            {
+                return it->second;
+            }
+            bool res = false;
+            for (int i = 0; i < len; i++)
+            {
+                int temp = n - v[i];
+                if (temp == 0)
+                {
+                    // alice ke time pe 0 hua hai means alice wins
+                    res = true;
+                    break;
+                }
+                if (temp == 0)
+                {
+                    continue;
+                }
+                bool branch_value = dfs(temp, v, h, len, false);
+                if (branch_value == true)
+                {
+                    res = true;
+                    break;
+                }
+            }
+            h[s] = res;
+            return res;
         }
         else
         {
-            // right top is smaller
-            sum += rt;
-            rpq.pop();
-            rpq.push(costs[j]);
-            j--;
+            // its bobs turn
+            string s = "bob_" + to_string(n);
+            auto it = h.find(s);
+            if (it != h.end())
+            {
+                return it->second;
+            }
+            bool res = true;
+            for (int i = 0; i < len; i++)
+            {
+                int temp = n - v[i];
+                if (temp == 0)
+                {
+                    // bob ke time pe 0 hua hai means alice looses
+                    res = false;
+                    break;
+                }
+                if (temp < 0)
+                {
+                    continue;
+                }
+                bool branch_value = dfs(temp, v, h, len, true);
+                if (branch_value == false)
+                {
+                    res = false;
+                    break;
+                }
+            }
+            h[s] = res;
+            return res;
         }
-
-        round++;
     }
-    // reached here means either rounds are over or i equals j
-    while (round < k and lpq.size() > 0 and rpq.size() > 0)
-    {
 
-        lt = lpq.top();
-        rt = rpq.top();
-        if (lt <= rt)
+    bool winnerSquareGame(int n)
+    {
+        // return true for alice win and false for bob
+        // when its alices turn if any of the branch returns true then we return true
+        // when its bobs turn  if any branch returns false then we return false
+        unordered_map<string, bool> h;
+        // inevery recursive call only 2 things change : value of n and whose turn it is
+        vector<int> v;
+        int limit = pow(n, 0.5);
+        for (int i = 1; i <= limit; i++)
         {
-            sum += lt;
-            lpq.pop();
+            v.push_back(i * i);
         }
-        else
-        {
-            // right top is smaller
-            sum += rt;
-            rpq.pop();
-        }
-
-        round++;
+        int len = v.size();
+        reverse(v.begin(), v.end());
+        bool res = dfs(n, v, h, len, true);
+        //printhash(h);
+        return res;
     }
-    while (round < k and lpq.size() > 0)
-    {
-        // reached here means rpq is empty
-        lt = lpq.top();
-        sum += lt;
-        lpq.pop();
-        round++;
-    }
-    while (round < k and rpq.size() > 0)
-    {
-        // reached here means lpq is empty
-        rt = rpq.top();
-        sum += rt;
-        rpq.pop();
-        round++;
-    }
-    // now we are sure rounds are over
-    return sum;
-}
+};
