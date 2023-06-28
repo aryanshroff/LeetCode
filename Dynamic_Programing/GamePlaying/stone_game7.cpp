@@ -128,6 +128,7 @@ int subsetSum(int x, int y, int n, vector<int> &left, vector<int> &v)
 
 void printState(bool alice, int c1, int v1, int c2, int v2, int start, int end, int depth)
 {
+    static int count=0;
     string s = "turn: ";
     if (alice)
     {
@@ -138,7 +139,8 @@ void printState(bool alice, int c1, int v1, int c2, int v2, int start, int end, 
         s += "Bob ";
     }
     cout << endl;
-    cout << s << " choice1: " << c1 << " val1: " << v1 << " choice2: " << c2 << " val2: " << v2 << " start: " << start << " end: " << end << " depth: " << depth << endl;
+    cout << s << " choice1: " << c1 << " val1: " << v1 << " choice2: " << c2 << " val2: " << v2 << " start: " << start << " end: " << end << " depth: " << depth <<" Count: "<<count<< endl;
+    count++;
 }
 
 int dfs(vector<int> &v, vector<int> left, int start, int end, bool alice, int n, int as, int bs, int depth, unordered_map<string, int> &h)
