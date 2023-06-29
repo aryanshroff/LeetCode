@@ -91,6 +91,21 @@ void generate(string s)
     cout << endl;
 }
 
+struct TreeNode
+{
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+};
+
+
+
+//************************************************************************************************************************************************************************************************
+//************************************************************************************************************************************************************************************************
+// template <class V, class W>
 void printAdjList(vector<pair<int, int>> adj[],int start,int length)
 {
     int n=length;
@@ -109,27 +124,41 @@ void printAdjList(vector<pair<int, int>> adj[],int start,int length)
     }
 }
 
-struct TreeNode
+typedef pair<int, int> pi;
+int networkDelayTime(vector<vector<int>> &times, int n, int k)
 {
-    int val;
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode() : val(0), left(nullptr), right(nullptr) {}
-    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
-};
+    int delay = INT32_MAX;
+    // generate a res array storing single source shortest path from k
+    // return max value of res array , if max==INT_MAX then return -1
 
-//call generate function to generate 2d vector from string s
+    // times array is u,v,wt format lets convert it to graph in adjcentcy list format
+    // we have nodes frpm 1 to n i. index 1 to n total length =n+1;
+    vector<pair<int, int>> adj[n + 1]; // this is the adjacency list declaration
+    int cnt = 0;                       // index counter for times
+    for (auto i : times)
+    {
+        adj[i[0]].push_back({i[1], i[2]});
+        cnt++;
+    }
+    printAdjList(adj,1,n+1);
 
-//************************************************************************************************************************************************************************************************
-//************************************************************************************************************************************************************************************************
-
+    if (delay == INT32_MAX)
+    {
+        return -1;
+    }
+    else
+    {
+        return delay;
+    }
+}
 
 void mymain()
 {
-    string s = "";
+    string s = "[[2,1,1],[2,3,1],[3,4,1]]";
     generate(s);
-    int result = 0; //call ur function here
+    int result = 0;
+    vector<vector<int>> times = {{2, 1, 1}, {2, 3, 1}, {3, 4, 1}};
+    result = networkDelayTime(times, 4, 2);
     cout << "result: " << result << endl;
 }
 

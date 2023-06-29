@@ -91,24 +91,6 @@ void generate(string s)
     cout << endl;
 }
 
-void printAdjList(vector<pair<int, int>> adj[],int start,int length)
-{
-    int n=length;
-    //start index is if u want to print from 0 to length n for n vertices 
-    //or from index 1 to length n+1 for n vertices .
-    //is nomenclature of vertices in ur graph problem is 0 to n-1 type 0 to n else for 1 to n nomenclature type 1,n+1
-    for (int i = start; i < n; i++)
-    {
-        cout << i << " -> " << endl;
-        for (int j = 0; j < adj[i].size(); j++)
-        {
-            cout << adj[i][j].first << " and cost is : " << adj[i][j].second << endl;
-        }
-        cout << endl;
-        cout << endl;
-    }
-}
-
 struct TreeNode
 {
     int val;
@@ -119,17 +101,31 @@ struct TreeNode
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-//call generate function to generate 2d vector from string s
+// call generate function to generate 2d vector from string s
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
+int solve(TreeNode *root,int &tilt){  //solve will return subtree sum at all cases
+    if(root==NULL){
+        return 0;
+    }
+    int LTsum=solve(root->left,tilt);
+    int RTsum=solve(root->right,tilt);
+    tilt+=abs(LTsum-RTsum);
+    return root->val+LTsum+RTsum;
+}
 
+int findTilt(TreeNode *root)
+{
+    int tilt=0;
+    int Treesum=solve(root,tilt);
+    return tilt;
+}
 
 void mymain()
 {
     string s = "";
-    generate(s);
-    int result = 0; //call ur function here
+    int result = 0;
     cout << "result: " << result << endl;
 }
 

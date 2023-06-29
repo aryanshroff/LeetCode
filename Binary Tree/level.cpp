@@ -91,24 +91,6 @@ void generate(string s)
     cout << endl;
 }
 
-void printAdjList(vector<pair<int, int>> adj[],int start,int length)
-{
-    int n=length;
-    //start index is if u want to print from 0 to length n for n vertices 
-    //or from index 1 to length n+1 for n vertices .
-    //is nomenclature of vertices in ur graph problem is 0 to n-1 type 0 to n else for 1 to n nomenclature type 1,n+1
-    for (int i = start; i < n; i++)
-    {
-        cout << i << " -> " << endl;
-        for (int j = 0; j < adj[i].size(); j++)
-        {
-            cout << adj[i][j].first << " and cost is : " << adj[i][j].second << endl;
-        }
-        cout << endl;
-        cout << endl;
-    }
-}
-
 struct TreeNode
 {
     int val;
@@ -119,17 +101,44 @@ struct TreeNode
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-//call generate function to generate 2d vector from string s
+// call generate function to generate 2d vector from string s
 
 //************************************************************************************************************************************************************************************************
 //************************************************************************************************************************************************************************************************
-
+vector<double> averageOfLevels(TreeNode *root)
+{
+    vector<double> res;
+    queue<TreeNode *> q;
+    q.push(root);
+    q.push(NULL);
+    int sum=0,count=0;
+    while(q.size()>1){
+        TreeNode *top=q.front();
+        q.pop();
+        if(top==NULL){
+            //elevel ended
+            q.push(NULL);
+            double avg= sum/count;
+            res.push_back(avg);
+            sum=0;
+            count=0;
+            continue;
+        }
+        sum+=top->val;
+        if(top->left){
+            q.push(top->left);
+        }
+        if(top->right){
+            q.push(top->right);
+        }
+    }
+    return res;
+}
 
 void mymain()
 {
     string s = "";
-    generate(s);
-    int result = 0; //call ur function here
+    int result = 0;
     cout << "result: " << result << endl;
 }
 
