@@ -154,14 +154,14 @@ int dfs(vector<int> &v, vector<int> left, int start, int end, bool alice, int n,
     }
     if (alice == true)
     {
-        /*
-        string s = "alice_" + to_string(start) + "_" + to_string(end);
+        
+        string s = "alice_" + to_string(as) + "_" + to_string(bs);
         auto it = h.find(s);
         if (it != h.end())
         {
             return it->second;
         }
-        */
+        
         // its alices turn
         // as is alice score
         // lets say she picks start limits for next round are start+1,end
@@ -175,21 +175,21 @@ int dfs(vector<int> &v, vector<int> left, int start, int end, bool alice, int n,
         printState(alice, choice1, val1, choice2, val2, start, end, depth);
         int ans = max(val2, val1);
         cout << "at depth " << depth << " alice returns: " << ans << endl;
-        //h[s] = ans;
+        h[s] = ans;
         return ans;
     }
     else
     {
         // its bobs turn
         // we will return min out of val1 and val2
-        /*
-        string s = "bob_" + to_string(start) + "_" + to_string(end);
+        
+        string s = "bob_" + to_string(as) + "_" + to_string(bs);
         auto it = h.find(s);
         if (it != h.end())
         {
             return it->second;
         }
-        */
+        
         // bobs picks first element
         int choice1 = subsetSum(start + 1, end, n, left, v);
         int val1 = dfs(v, left, start + 1, end, true, n, as, bs + choice1, depth + 1, h);
@@ -201,7 +201,7 @@ int dfs(vector<int> &v, vector<int> left, int start, int end, bool alice, int n,
 
         int ans = min(val1, val2);
         cout << "at depth " << depth << " bob returns: " << ans << endl;
-        //h[s]=ans;
+        h[s]=ans;
         return ans;
     }
 }
@@ -230,8 +230,11 @@ void mymain()
 {
     string s = "";
     vector<int> v = {7, 90, 5, 1, 100, 10, 10, 2};
+    vector<int> v2 = {721,979,690,84,742,873,31,323,819,22,928,866,118,843,169,818};
+ //count of calls: 32766 ans=4808 by pure recursion
+ //count of calls:32448  ans=4808 by memoising using as and bs
 
-    int result = stoneGameVII(v);
+    int result = stoneGameVII(v2);
     cout << endl
          << endl;
     cout << "result: " << result << endl;
