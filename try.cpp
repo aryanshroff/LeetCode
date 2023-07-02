@@ -1,40 +1,32 @@
 class Solution
 {
 public:
-    int dfs(vector<vector<int>> &grid, int row, int col, int i, int j)
+    bool dfs(vector<vector<char>> &m, int row, int col, int i, int j)
     {
-        if (i < 0 or i > row or j < 0 or j > col)
+        if (i < 0 or i >= row or j < 0 or j >= col)
         {
-            return 0;
+            return false;
         }
-        else if (grid[i][j] == 0)
-            return;
+        else if (m[i][j] == 'X')
+        {
+            return true;
+        }
         else
         {
-            // reached here means its 1
-
-            // make it 0
-            grid[i][j] = 0;
-            // make dfs calls on it
-            return 1 + dfs(grid, row, col, i - 1, j) + dfs(grid, row, col, i + 1, j) + dfs(grid, row, col, i, j - 1) + dfs(grid, row, col, i, j + 1);
+            // its an O hence we return the status of the current O
+            bool res = dfs(m, row, col, i - 1, j) & dfs(m, row, col, i + 1, j) & dfs(m, row, col, i, j - 1) & dfs(m, row, col, i, j + 1);
+            if (res == true)
+            {
+                m[i][j] = 'X';
+            }
+            return res;
         }
     }
 
-    int maxAreaOfIsland(vector<vector<int>> &grid)
+    void solve(vector<vector<char>> &board)
     {
-        int row = grid.size();
-        int col = grid[0].size();
-        int maxArea = 0;
-        for (int i = 0; i < row; i++)
-        {
-            for (int j = 0; j < col; j)
-            {
-                if (grid[i][j] == 1)
-                {
-                    maxArea = max(maxArea, dfs(grid, row, col, i, j));
-                }
-            }
-        }
-        return maxArea;
+        int row = board.size();
+        int col = board[0].size();
+        
     }
 };
