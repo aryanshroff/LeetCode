@@ -42,7 +42,7 @@ class Compare_class
 public:
     bool operator()(Job &a, Job &b)
     {
-        // max profit at top
+        // max profit at top:  return true for what you want at top
         if (a.getProfit() < b.getProfit())
         {
             return true;
