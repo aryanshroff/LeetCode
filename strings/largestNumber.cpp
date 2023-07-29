@@ -125,37 +125,15 @@ struct TreeNode
 //************************************************************************************************************************************************************************************************
 bool cmp(int a,int b){  //return true for a is greater than b
     
-    while(true){
-        if(a==b){
-            return true;
-        }
-        int x1=a%10;
-        a=a/10;
-        int x2=b%10;
-        b=b/10;
-        if(x1>x2){
-            return true;
-        }
-        else if(x1<x2){
-            return false;
-        }
-        if(a==0 ){
-            if(x1>b){
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-        if(b==0){
-            if(x2>a){
-                return false;
-            }
-            else{
-                return true;
-            }
-        }
-        
+    string a1=to_string(a);
+    string b1=to_string(b);
+    string afirst=a1+b1;
+    string bfirst=b1+a1;
+    if(afirst>=bfirst){
+        return true;
+    }
+    else{
+        return false;
     }
     
 }
@@ -196,11 +174,18 @@ string largestNumber(vector<int> &nums)
 {
     string text="";
     //print1d(nums);
+    bool nonZero=false;
     vector<int> res=quicksort(nums);
     int n=res.size();
     for(int i=n-1; i>=0; i--){
+        if(nonZero==false and res[i]>0){
+            nonZero=true;
+        }
         string x=to_string(res[i]);
         text+=x;
+    }
+    if(nonZero==false){
+        return "0";
     }
     return text;
 }
@@ -209,7 +194,7 @@ void mymain()
 {
     string s = "";
     generate(s);
-    vector<int> nums={23,2};
+    vector<int> nums={3,30,34,5,9};
     s=largestNumber(nums);
     int result = 0; // call ur function here
     cout << "result: " << s << endl;
