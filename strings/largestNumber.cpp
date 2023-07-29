@@ -130,10 +130,10 @@ bool cmp(int a,int b){  //return true for a is greater than b
     string afirst=a1+b1;
     string bfirst=b1+a1;
     if(afirst>=bfirst){
-        return true;
+        return false;
     }
     else{
-        return false;
+        return true;
     }
     
 }
@@ -169,13 +169,18 @@ vector <int> quicksort(vector<int> &nums){
     }
 }
 
+vector<int> stlsort(vector<int> &nums){
+    sort(nums.begin(), nums.end(),cmp);
+    return nums;
+}
+
 
 string largestNumber(vector<int> &nums)
 {
     string text="";
     //print1d(nums);
     bool nonZero=false;
-    vector<int> res=quicksort(nums);
+    vector<int> res=stlsort(nums);
     int n=res.size();
     for(int i=n-1; i>=0; i--){
         if(nonZero==false and res[i]>0){
